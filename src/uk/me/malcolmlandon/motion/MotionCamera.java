@@ -71,14 +71,23 @@ public class MotionCamera {
 
 	private String parseStatusResponse(HttpResponse response) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-		String line = reader.readLine();
-		if (line.contains("PAUSE")) {
-			return "Motion Status: PAUSED";
-		} else if (line.contains("ACTIVE")) {
-			return "Motion Status: ACTIVE";				
-		} else {
-			return "Motion status UNKNOWN. Response Body: " + line;
-		}
+		StringBuilder content = new StringBuilder();
+		String line;
+		
+		do {
+			line = reader.readLine();
+			if (line != null) {
+				if (line.contains("PAUSE")) {
+					return "Motion Status: PAUSED";
+				} else if (line.contains("ACTIVE")) {
+					return "Motion Status: ACTIVE";				
+				} else {
+					content.append(line);
+				}
+			}
+		} while (line != null);
+
+		return "Motion status UNKNOWN. Response Body: " + content.toString();
 	}
 	
 	public String startDetection() {
